@@ -84,24 +84,39 @@ const sendEmail = async () => {
                 const { _id, email, problemLink, problemName } = emailDoc
                 // console.log(emailDoc, " email Doc ");
                 const mailOptions = {
-                    from: ADMIN_EMAIL,    // Sender email (must be a Gmail account)
+                    from: ADMIN_EMAIL, 
                     to: email,
                     subject: `Reminder: Solve "${problemName}" on LeetCode`,
                     html: `
                     <html>
-                    <body>
-                        <h2 style="color: #007bff;">🚀 LeetCode Reminder 🚀</h2>
-                        <p style="font-size: 16px;">
-                            Hello there! 😊<br>
-                            Just a friendly reminder to tackle the problem "${problemName}" on LeetCode.
-                            You've got this! 💪<br>
-                            Remember, every problem is just a puzzle waiting to be solved! 🧩<br>
-                            Here's the link to the problem: <a href="${problemLink}" target="_blank">${problemLink}</a>.
-                            Take a deep breath, dive in, and give it your best shot! 🎯
-                        </p>
-                    </body>
-                </html>
-                
+                        <style>
+                            body {
+                                background: beige;
+                                padding: 20px;
+                                font-family: monospace;
+                            }
+
+                            h2 {
+                                text-align: center;
+                                text-decoration: underline;
+                                font-size: 26px;
+                                font-family: sans-serif;
+                                font-weight: 900;
+                            }
+                        </style>
+
+                        <body>
+                            <h2 style="color: darkgreen;">LeetCode Reminder🔔</h2>
+                            <p style="font-size: 16px;">
+                                Hello there! 😊👋<br>
+                                Just a friendly reminder to tackle the problem "${problemName}" on LeetCode.
+                                You've got this! 💪<br>
+                                Remember, every problem is just a puzzle waiting to be solved! 🧩<br>
+                                Here's the link to the problem: <a href="${problemLink}" target="_blank">${problemLink}</a>.
+                                Take a deep breath, dive in, and give it your best shot! 🎯
+                            </p>
+                        </body>
+                    </html>
                     `
                 };
 
