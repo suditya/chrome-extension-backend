@@ -41,6 +41,10 @@ const getFutureDate = (afterDays) => {
     return futureDate;
 }
 
+app.get('/api/', (_req, res) => {
+    return res.send("API for Leetcode Chrome Extension Running")
+})
+
 // Route to receive data and schedule email sending
 app.post('/api/schedule-email', async (req, res) => {
     try {
@@ -84,7 +88,7 @@ const sendEmail = async () => {
                 const { _id, email, problemLink, problemName } = emailDoc
                 // console.log(emailDoc, " email Doc ");
                 const mailOptions = {
-                    from: ADMIN_EMAIL, 
+                    from: ADMIN_EMAIL,
                     to: email,
                     subject: `Reminder: Solve "${problemName}" on LeetCode`,
                     html: `
