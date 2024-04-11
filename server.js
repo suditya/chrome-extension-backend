@@ -87,7 +87,22 @@ const sendEmail = async () => {
                     from: ADMIN_EMAIL,    // Sender email (must be a Gmail account)
                     to: email,
                     subject: `Reminder: Solve "${problemName}" on LeetCode`,
-                    text: `Don't forget to solve the problem "${problemName}" on LeetCode. Here's the link: ${problemLink}`
+                    html: `
+                    <html>
+                    <body>
+                        <h2 style="color: #007bff;">🚀 LeetCode Reminder 🚀</h2>
+                        <p style="font-size: 16px;">
+                            Hello there! 😊<br>
+                            Just a friendly reminder to tackle the problem "${problemName}" on LeetCode.
+                            You've got this! 💪<br>
+                            Remember, every problem is just a puzzle waiting to be solved! 🧩<br>
+                            Here's the link to the problem: <a href="${problemLink}" target="_blank">${problemLink}</a>.
+                            Take a deep breath, dive in, and give it your best shot! 🎯
+                        </p>
+                    </body>
+                </html>
+                
+                    `
                 };
 
                 // Send email
