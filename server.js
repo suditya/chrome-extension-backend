@@ -41,7 +41,7 @@ const getFutureDate = (afterDays) => {
     return futureDate;
 }
 
-app.get('/api/', (_req, res) => {
+app.get('/', (_req, res) => {
     return res.send("API for Leetcode Chrome Extension Running")
 })
 
