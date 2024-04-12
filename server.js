@@ -42,7 +42,7 @@ const getFutureDate = (afterDays) => {
 }
 
 app.get('/', (_req, res) => {
-    return res.json({ message: "Leetcode Chrome Extension Server!" })
+    return res.status(200);
 })
 
 // Route to receive data and schedule email sending
