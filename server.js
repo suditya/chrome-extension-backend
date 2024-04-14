@@ -19,7 +19,7 @@ const ADMIN_EMAIL = "leetcodereminderx@gmail.com";
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
-app.use(cors());
+app.use(cors({origin:true}));
 
 // Initialize Nodemailer transporter
 const transporter = nodemailer.createTransport({
