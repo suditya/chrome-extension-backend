@@ -92,35 +92,73 @@ const sendEmail = async () => {
                     to: email,
                     subject: `Reminder: Solve "${problemName}" on LeetCode`,
                     html: `
-                    <html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>LeetCode Reminder</title>
                         <style>
                             body {
-                                background: beige;
+                                background-color: #f4f4f4;
+                                font-family: Arial, sans-serif;
+                                margin: 0;
                                 padding: 20px;
-                                font-family: monospace;
+                            }
+
+                            .container {
+                                max-width: 600px;
+                                margin: 0 auto;
+                                background-color: #fff;
+                                border-radius: 8px;
+                                padding: 30px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                             }
 
                             h2 {
                                 text-align: center;
                                 text-decoration: underline;
-                                font-size: 26px;
-                                font-family: sans-serif;
-                                font-weight: 900;
+                                color: #4caf50;
+                                font-size: 28px;
+                                font-weight: bold;
+                                margin-bottom: 20px;
+                            }
+
+                            p {
+                                font-size: 16px;
+                                line-height: 1.6;
+                                color: #333;
+                            }
+
+                            a {
+                                color: #007bff;
+                                text-decoration: none;
+                                font-weight: bold;
+                            }
+
+                            a:hover {
+                                text-decoration: underline;
+                            }
+
+                            .emoji {
+                                font-size: 24px;
+                                margin-right: 5px;
+                            }
+
+                            .reminder {
+                                text-align: center;
+                                margin-bottom: 20px;
                             }
                         </style>
+                    </head>
+                <body>
+                    <div class="container">
+                        <h2>LeetCode Reminder<span class="emoji">🔔</span></h2>
+                        <div class="reminder">Hello there! <span class="emoji">😊👋</span> Just a friendly reminder to tackle the problem "<strong>${problemName}</strong>" on LeetCode. You've got this! <span class="emoji">💪</span> Remember, every problem is just a puzzle waiting to be solved! <span class="emoji">🧩</span></div>
+                        <p>Here's the link to the problem: <a href="${problemLink}" target="_blank">${problemLink}</a>. Take a deep breath, dive in, and give it your best shot! <span class="emoji">🎯</span></p>
+                    </div>
+                </body>
+                </html>
 
-                        <body>
-                            <h2 style="color: darkgreen;">LeetCode Reminder🔔</h2>
-                            <p style="font-size: 16px;">
-                                Hello there! 😊👋<br>
-                                Just a friendly reminder to tackle the problem "${problemName}" on LeetCode.
-                                You've got this! 💪<br>
-                                Remember, every problem is just a puzzle waiting to be solved! 🧩<br>
-                                Here's the link to the problem: <a href="${problemLink}" target="_blank">${problemLink}</a>.
-                                Take a deep breath, dive in, and give it your best shot! 🎯
-                            </p>
-                        </body>
-                    </html>
                     `
                 };
 
