@@ -12,14 +12,19 @@ const uri =
 const client = new MongoClient(uri, {});
 const db = client.db(DB_NAME);
 const app = express();
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
 const SCHEDULE_EMAIL_COLL = "scheduledEmails";
 const ADMIN_EMAIL = "leetcodereminderx@gmail.com";
 
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
-app.use(cors());
+
 
 // Initialize Nodemailer transporter
 const transporter = nodemailer.createTransport({
