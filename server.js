@@ -75,13 +75,13 @@ app.post('/api/schedule-email', async (req, res) => {
             console.log("email already scheduled");
             const day = alreadyScheduled.scheduledDay;
             const scheduledDay = day._d;
-            return res.status(200).send({ message: `Email Already Scheduled on ${scheduledDay}` });
+            return res.status(200).json({ message: `Email Already Scheduled on ${scheduledDay}` });
         }
         await db.collection(SCHEDULE_EMAIL_COLL).insertOne(emailDoc);
-        return res.status(200).send({ message: `Email scheduled successfully}` });
+        return res.status(200).json({ message: `Email scheduled successfully}` });
     } catch (e) {
         console.error('Error scheduling email:', error); // Log the error for debugging
-        return res.status(500).send({ message: 'Internal server error' }); // Generic error response
+        return res.status(500).json({ message: 'Internal server error' }); // Generic error response
     }
 });
 
