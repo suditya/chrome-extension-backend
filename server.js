@@ -62,7 +62,7 @@ app.post('/api/schedule-email', async (req, res) => {
 
         // Validate input
         if (!problemLink || !email || !afterDays || !problemName) {
-            return res.status(400).send('Missing required parameters');
+            return res.status(400).json({ message: 'Missing required parameters' });
         }
         const scheduledDay = getFutureDate(afterDays)
         // add to the DB Q
