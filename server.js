@@ -75,7 +75,11 @@ app.post('/api/schedule-email', async (req, res) => {
             console.log("email already scheduled");
             const day = alreadyScheduled.scheduledDay;
             const scheduledDay = day._d;
-            return res.status(200).json({ message: `Email Already Scheduled on ${scheduledDay}` });
+            const formattedDate = new Date(scheduledDay); // Convert the string date to a Date object
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
+            const formattedDateString = formattedDate.toLocaleString('en-US', options); // Format the date string
+            const message = `Email Already Scheduled for ${formattedDateString}`; // Display the formatted date using alert
+            return res.status(200).json({ message });
         }
         await db.collection(SCHEDULE_EMAIL_COLL).insertOne(emailDoc);
         return res.status(200).json({ message: `Email scheduled successfully}` });
