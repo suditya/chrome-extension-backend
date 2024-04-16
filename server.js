@@ -80,7 +80,8 @@ app.post('/api/schedule-email', async (req, res) => {
         await db.collection(SCHEDULE_EMAIL_COLL).insertOne(emailDoc);
         return res.status(200).send(`Email scheduled successfully`);
     } catch (e) {
-        return res.status(500).send(`Error sending email reason : ${e}`);
+        console.error('Error scheduling email:', error); // Log the error for debugging
+        return res.status(500).send('Internal server error'); // Generic error response
     }
 });
 
