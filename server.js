@@ -57,37 +57,39 @@ app.get('/', (_req, res) => {
 // Route to receive data and schedule email sending
 app.post('/api/schedule-email', async (req, res) => {
     try {
-        // console.log(req.body)
         const { problemLink, email, afterDays, problemName } = req.body;
 
         // Validate input
         if (!problemLink || !email || !afterDays || !problemName) {
-            return res.status(400).json({ message: 'Missing required parameters' });
+            return res.status(400).json({ message: '❌ Missing required parameters' });
         }
-        const scheduledDay = getFutureDate(afterDays)
-        // add to the DB Q
+
+        const scheduledDay = getFutureDate(afterDays);
         const emailDoc = {
             email, problemLink, problemName, scheduledDay
-        }
-        console.log(emailDoc, " email Doc ")
+        };
+
+        console.log(emailDoc, " email Doc ");
+
         const alreadyScheduled = await isAlreadyScheduled(emailDoc);
         if (alreadyScheduled) {
             console.log("email already scheduled");
             const day = alreadyScheduled.scheduledDay;
-            const scheduledDay = day._d;
-            const formattedDate = new Date(scheduledDay); // Convert the string date to a Date object
+            const formattedDate = new Date(day._d);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
-            const formattedDateString = formattedDate.toLocaleString('en-US', options); // Format the date string
-            const message = `Email Already Scheduled for ${formattedDateString}`; // Display the formatted date using alert
+            const formattedDateString = formattedDate.toLocaleString('en-US', options);
+            const message = `✉️ Email Already Scheduled for ${formattedDateString}`;
             return res.status(200).json({ message });
         }
+
         await db.collection(SCHEDULE_EMAIL_COLL).insertOne(emailDoc);
-        return res.status(200).json({ message: `Email scheduled successfully}` });
+        return res.status(200).json({ message: `✅ Email scheduled successfully` });
     } catch (e) {
-        console.error('Error scheduling email:', error); // Log the error for debugging
-        return res.status(500).json({ message: 'Internal server error' }); // Generic error response
+        console.error('Error scheduling email:', error);
+        return res.status(500).json({ message: '❌ Internal server error' });
     }
 });
+
 
 
 // Scheduling email sending using node-cron
