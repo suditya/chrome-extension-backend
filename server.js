@@ -46,6 +46,10 @@ const getFutureDate = (afterDays) => {
     return futureDate;
 }
 
+const isAlreadyScheduled = async (emailDoc) => {
+    return await db.collection(SCHEDULE_EMAIL_COLL).findOne({ email: emailDoc.email, problemLink: emailDoc.problemLink, problemName: emailDoc.problemName });
+}
+
 app.get('/', (_req, res) => {
     return res.status(200);
 })
@@ -54,17 +58,25 @@ app.get('/', (_req, res) => {
 app.post('/api/schedule-email', async (req, res) => {
     try {
         // console.log(req.body)
-        const problemLink = req.body.problemLink ?? "problem link";
-        const email = req.body.email ?? "email";
-        const afterDays = req.body.afterDays ?? '7';
-        const problemName = req.body.problemName ?? "problem name";
+        const { problemLink, email, afterDays, problemName } = req.body;
 
+        // Validate input
+        if (!problemLink || !email || !afterDays || !problemName) {
+            return res.status(400).send('Missing required parameters');
+        }
         const scheduledDay = getFutureDate(afterDays)
         // add to the DB Q
         const emailDoc = {
             email, problemLink, problemName, scheduledDay
         }
         console.log(emailDoc, " email Doc ")
+        const alreadyScheduled = await isAlreadyScheduled(emailDoc);
+        if (alreadyScheduled) {
+            console.log("email already scheduled");
+            const day = alreadyScheduled.scheduledDay;
+            const scheduledDay = day._d;
+            return res.status(200).send(`Email Already Scheduled on ${scheduledDay}`);
+        }
         await db.collection(SCHEDULE_EMAIL_COLL).insertOne(emailDoc);
         return res.status(200).send(`Email scheduled successfully`);
     } catch (e) {
