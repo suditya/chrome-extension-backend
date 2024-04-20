@@ -93,7 +93,7 @@ app.post('/api/schedule-email', async (req, res) => {
 
 
 // Scheduling email sending using node-cron
-cron.schedule("0 0 * * * *", async () => { // currently running every hour
+cron.schedule("0 0 9-21 * * *", async () => { // currently running every hour
     console.log(`cron job ran at : ${new Date()}`)
     await sendEmail();
 });
