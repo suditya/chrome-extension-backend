@@ -5,6 +5,8 @@ const DB_NAME = "Leetcode-Extension";
 const MongoClient = require('mongodb').MongoClient;
 const moment = require('moment');
 const cors = require('cors');
+const fs = require('fs');
+
 
 const uri =
     "mongodb+srv://suditya:Suditya%40123@poodisabjidotcom.jjmenhc.mongodb.net/?retryWrites=true&w=majority&appName=PoodiSabjiDotCom";
@@ -50,6 +52,14 @@ const isAlreadyScheduled = async (emailDoc) => {
     return await db.collection(SCHEDULE_EMAIL_COLL).findOne({ email: emailDoc.email, problemLink: emailDoc.problemLink, problemName: emailDoc.problemName });
 }
 
+const addIPAddressToLog = (request) => {
+    const ipAddress = request.socket.remoteAddress ?? '786.0.0.1';
+    const currDate = new Date();
+    fs.appendFile('./server_logs.txt', `Date: ${currDate} , IP: ${ipAddress} \n`, (err) => {
+        if (err) console.log("error", err);
+    });
+}
+
 app.get('/', (_req, res) => {
     return res.status(200);
 })
@@ -59,6 +69,11 @@ app.post('/api/schedule-email', async (req, res) => {
     try {
         const { problemLink, email, afterDays, problemName } = req.body;
 
+        try {
+            addIPAddressToLog(req);
+        } catch (err) {
+            console.log(`error while adding IP address to log: ${err}`)
+        }
         // Validate input
         if (!problemLink || !email || !afterDays || !problemName) {
             return res.status(400).json({ message: '❌ Missing required parameters' });
