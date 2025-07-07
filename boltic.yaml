@@ -1,0 +1,9 @@
+# boltic.yaml
+app: "leetcode-extension-backend"
+region: "asia-south1"
+handler: "handler.handler"
+language: "nodejs/18"
+
+build:
+  builtin: dockerfile
+  ignorefile: .gitignore
