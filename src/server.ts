@@ -22,17 +22,17 @@ async function bootstrap() {
   // Initialize Email Transport
   const emailTransport = new NodemailerTransport(config.adminEmail, config.adminPass);
 
-  // Initialize Express App
-  const app = createApp(reminderService, config);
+  // Initialize Worker Scheduler
+  const scheduler = new NotificationScheduler(reminderService, emailTransport, config);
+  scheduler.start();
+
+  // Initialize Express App (wired with scheduler sweep trigger for cron-job.org)
+  const app = createApp(reminderService, config, () => scheduler.processDueReminders());
 
   // Start HTTP Server
   const server = app.listen(config.port, () => {
     console.log(`[HTTP] LeetCode Revision OS API listening on port ${config.port}`);
   });
-
-  // Start Worker Scheduler
-  const scheduler = new NotificationScheduler(reminderService, emailTransport, config);
-  scheduler.start();
 
   // Graceful Shutdown
   const shutdown = async (signal: string) => {

@@ -5,7 +5,12 @@ import type { ReminderService } from '../modules/reminders/service.ts';
 import { STANDARD_TOPICS } from '../modules/problems/types.ts';
 import { AppError } from '../middleware/errorHandler.ts';
 
-export function createApiRouter(reminderService: ReminderService): Router {
+export interface ApiRouterOptions {
+  triggerSweep?: () => Promise<{ delivered: number; failed: number; reclaimed: number }>;
+  cronSecret?: string;
+}
+
+export function createApiRouter(reminderService: ReminderService, options?: ApiRouterOptions): Router {
   const router = Router();
 
   // Health & Liveness Probe
@@ -30,6 +35,39 @@ export function createApiRouter(reminderService: ReminderService): Router {
       version: '2.0.0',
       timestamp: new Date().toISOString(),
     });
+  });
+
+  // External Cron Trigger (e.g. cron-job.org or custom webhook)
+  // Wakes up free-tier instances and dispatches due reminders
+  router.all('/api/cron/sweep', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const configuredSecret = options?.cronSecret || process.env.CRON_SECRET;
+      if (configuredSecret) {
+        const authHeader = req.headers.authorization;
+        const customHeader = req.headers['x-cron-secret'];
+        const querySecret = (req.query.secret || req.query.key) as string | undefined;
+
+        const bearerMatch = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+        const providedToken = customHeader || bearerMatch || querySecret;
+
+        if (providedToken !== configuredSecret) {
+          throw new AppError('Unauthorized: invalid or missing cron secret token.', 401);
+        }
+      }
+
+      const result = options?.triggerSweep
+        ? await options.triggerSweep()
+        : { delivered: 0, failed: 0, reclaimed: 0 };
+
+      res.status(200).json({
+        success: true,
+        service: 'LeetSRS Cron Dispatcher',
+        timestamp: new Date().toISOString(),
+        ...result,
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 
   // Topics list

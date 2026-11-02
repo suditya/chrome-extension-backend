@@ -7,7 +7,11 @@ import { errorHandler, AppError } from './middleware/errorHandler.ts';
 import type { ReminderService } from './modules/reminders/service.ts';
 import type { AppConfig } from './config/index.ts';
 
-export function createApp(reminderService: ReminderService, config: AppConfig): express.Application {
+export function createApp(
+  reminderService: ReminderService,
+  config: AppConfig,
+  triggerSweep?: () => Promise<{ delivered: number; failed: number; reclaimed: number }>
+): express.Application {
   const app = express();
 
   app.set('trust proxy', 1);
@@ -23,7 +27,7 @@ export function createApp(reminderService: ReminderService, config: AppConfig): 
         return callback(null, true);
       },
       methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-cron-secret'],
     })
   );
 
@@ -34,7 +38,7 @@ export function createApp(reminderService: ReminderService, config: AppConfig): 
   app.use(requestLogger);
 
   // Mount API router
-  app.use('/', createApiRouter(reminderService));
+  app.use('/', createApiRouter(reminderService, { triggerSweep, cronSecret: config.cronSecret }));
 
   // 404 handler
   app.use((_req, _res, next) => {

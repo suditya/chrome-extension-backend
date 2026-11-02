@@ -229,4 +229,57 @@ test('API Integration: endpoints respond with expected contracts in-memory', asy
     url: `/api/reminders/${saveData.reminderId}`,
   });
   assert.strictEqual(delRes.statusCode, 200);
+
+  // 9. External Cron Webhook (/api/cron/sweep)
+  const cronRes = await simulateRequest(app, {
+    method: 'GET',
+    url: '/api/cron/sweep',
+  });
+  assert.strictEqual(cronRes.statusCode, 200);
+  const cronData = cronRes.json();
+  assert.strictEqual(cronData.success, true);
+  assert.strictEqual(cronData.service, 'LeetSRS Cron Dispatcher');
+});
+
+test('API Cron Protection: rejects unauthorized requests when CRON_SECRET is configured', async () => {
+  const service = new MockApiReminderService();
+  const configWithSecret: AppConfig = {
+    port: 3000,
+    nodeEnv: 'test',
+    mongoUri: 'mongodb://127.0.0.1:27017',
+    dbName: 'TestDB',
+    adminEmail: 'test@example.com',
+    adminPass: 'secret',
+    corsOrigin: '*',
+    backendPublicUrl: 'http://localhost:3000',
+    workerIntervalMs: 60000,
+    leaseTimeoutMs: 300000,
+    cronSecret: 'super-secret-key-456',
+  };
+
+  let sweepCalled = false;
+  const mockSweep = async () => {
+    sweepCalled = true;
+    return { delivered: 1, failed: 0, reclaimed: 0 };
+  };
+
+  const app = createApp(service as any, configWithSecret, mockSweep);
+
+  // Attempt without token
+  const unauthRes = await simulateRequest(app, {
+    method: 'GET',
+    url: '/api/cron/sweep',
+  });
+  assert.strictEqual(unauthRes.statusCode, 401);
+  assert.strictEqual(sweepCalled, false);
+
+  // Attempt with valid token via query parameter
+  const authQueryRes = await simulateRequest(app, {
+    method: 'GET',
+    url: '/api/cron/sweep?secret=super-secret-key-456',
+    query: { secret: 'super-secret-key-456' },
+  });
+  assert.strictEqual(authQueryRes.statusCode, 200);
+  assert.strictEqual(sweepCalled, true);
+  assert.strictEqual(authQueryRes.json().delivered, 1);
 });

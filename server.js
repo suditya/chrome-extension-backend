@@ -123,6 +123,34 @@ app.get("/api/topics", (_req, res) => {
   return res.status(200).json({ topics: TOPICS });
 });
 
+// External Cron Trigger (e.g. cron-job.org)
+app.all("/api/cron/sweep", async (req, res) => {
+  try {
+    const configuredSecret = process.env.CRON_SECRET;
+    if (configuredSecret) {
+      const authHeader = req.headers.authorization;
+      const customHeader = req.headers["x-cron-secret"];
+      const querySecret = req.query.secret || req.query.key;
+      const bearer = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+      const provided = customHeader || bearer || querySecret;
+
+      if (provided !== configuredSecret) {
+        return res.status(401).json({ success: false, message: "Unauthorized: invalid cron secret token." });
+      }
+    }
+
+    await dispatchDueReminders();
+    return res.status(200).json({
+      success: true,
+      service: "LeetSRS Cron Dispatcher",
+      timestamp: new Date().toISOString(),
+      message: "Cron sweep completed successfully.",
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 /**
  * 1. SAVE OR UPDATE A PROBLEM IN REVISION QUEUE
  * POST /api/reminders/save

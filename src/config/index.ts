@@ -42,6 +42,7 @@ export interface AppConfig {
   backendPublicUrl: string;
   workerIntervalMs: number;
   leaseTimeoutMs: number;
+  cronSecret: string;
 }
 
 export function validateConfig(): AppConfig {
@@ -59,6 +60,7 @@ export function validateConfig(): AppConfig {
     backendPublicUrl: process.env.BACKEND_PUBLIC_URL || 'http://localhost:3000',
     workerIntervalMs: 60 * 1000, // Check every minute in background
     leaseTimeoutMs: 5 * 60 * 1000, // 5 minute lock lease timeout
+    cronSecret: process.env.CRON_SECRET || '',
   };
 }
 
